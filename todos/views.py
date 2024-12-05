@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout
-from django.contrib.auth import login as login_django
+from django.contrib.auth import login as login_django, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
@@ -12,6 +12,7 @@ from django.contrib import messages
 
 from .models import Todo
 
+User = get_user_model() 
 
 class TodolistView(LoginRequiredMixin, ListView):
     model = Todo
@@ -51,14 +52,19 @@ def cadastro(request):
     else:
         username = request.POST.get('username')
         email = request.POST.get('email')
+        contato = request.POST.get('telefone')
         senha = request.POST.get('senha')
         
+        # Verifica se o usuário já existe
         user = User.objects.filter(username=username).first()
 
         if user:
             messages.error(request, 'Já existe um usuário com esse username.')
             return render(request, 'cadastro.html')
+        
+        # Cria um novo usuário
         user = User.objects.create_user(username=username, email=email, password=senha)
+        user.telefone = contato
         user.save()
 
         messages.success(request, 'Usuário cadastrado com sucesso! Faça login para continuar.')

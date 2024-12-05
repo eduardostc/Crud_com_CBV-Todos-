@@ -1,5 +1,7 @@
 from django.db import models
 from datetime import date
+from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 class Todo(models.Model):
@@ -15,3 +17,9 @@ class Todo(models.Model):
         if not self.finishe_at:
             self.finishe_at = date.today()
             self.save()
+
+class CustomUser(AbstractUser):
+    telefone = models.CharField(_("telefone de contato"), max_length=15, blank=True)
+
+    def __str__(self):
+        return self.username
